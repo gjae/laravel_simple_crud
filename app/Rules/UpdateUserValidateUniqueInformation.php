@@ -33,21 +33,22 @@ class UpdateUserValidateUniqueInformation implements Rule
     public function passes($attribute, $value)
     {
         try {
+
             $user = $this->repository->findById($this->currentUserId);
+
             if ($user->{$attribute} == $value) {
                 return true;
             }
 
             $duplicateEmail = $this->repository->createModel()->where($attribute, $value)->first();
             if($duplicateEmail) {
-                return true;
-            } else {
                 $this->errorString = "Este {$attribute} esta siendo utilizado por otra persona, vuelva a intentarlo";
-                return false;
-            }
+                return false;  
+            } 
 
-        } catch(ModelNotFoundException $e) {
             return true;
+        } catch(ModelNotFoundException $e) {
+            return false;
         }
     }
 

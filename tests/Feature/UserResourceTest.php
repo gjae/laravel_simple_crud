@@ -1,6 +1,6 @@
 <?php
 
-use function Pest\Laravel\{get, postJson, putJson};
+use function Pest\Laravel\{deleteJson, get, postJson, putJson};
 use App\Models\User;
 
 beforeEach(function() {
@@ -66,7 +66,7 @@ it("POST: /api/users - Store error: email invalid format", function() {
         ->assertSee("El email suministrado no tiene un formato valido.");
 });
 
-it("Update /api/user/{user} - Update ok", function() {
+it("PUT /api/user/{user} - Update ok", function() {
     
     $user = User::first();
 
@@ -76,4 +76,43 @@ it("Update /api/user/{user} - Update ok", function() {
     )
     ->assertOk()
     ->assertJsonFragment(["name" => "Jaimito", "email" => $user->email]);
+});
+
+it("PUT: /api/user/{user} - Update error email already used", function() {
+
+    $user = User::first();
+    $userEmailDup = User::all()[3];
+    putJson(
+        route("users.update", ["user" => $user->id]), 
+        ["email" => $userEmailDup->email]
+    )
+    ->assertStatus(422)
+    ->assertSee("Este email esta siendo utilizado por otra persona, vuelva a intentarlo");
+});
+
+it("PUT: /api/users/{user} - Update error when user update id_card because id_card already exists", function() {
+
+    $user = User::first();
+    $userEmailDup = User::all()[3];
+    putJson(
+        route("users.update", ["user" => $user->id]), 
+        ["id_card" => $userEmailDup->id_card]
+    )
+    ->assertStatus(422)
+    ->assertSee("Este id_card esta siendo utilizado por otra persona, vuelva a intentarlo");
+});
+
+
+it("DELETE: /api/users/{user} - Delete Ok ", function() {
+
+    $user = User::first();
+    deleteJson(route("users.destroy", ["user" => $user->id]))
+        ->assertOk();
+
+    expect(User::count())->toBe(3);
+});
+
+it("DELETE: /api/users/{user} - Delete ok when userId not exists", function() {
+    deleteJson(route("users.destroy", ["user" => 140]))
+        ->assertOk();
 });

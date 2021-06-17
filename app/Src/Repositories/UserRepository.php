@@ -75,7 +75,7 @@ class UserRepository implements Repository, BaseUserInterface{
      * @return boolean
      */
     public function update(int $id, array $updateData) : bool {
-        $isUpdated = $this->createModel()->findOrFail($id)->update($updateData);
+        $isUpdated = $this->findById($id)->update($updateData);
         return true;
     }
 
@@ -87,6 +87,12 @@ class UserRepository implements Repository, BaseUserInterface{
      */
     public function deleteById(int $id) : bool {
         try {
+            $nowDelete = now()->format("YmdHmi");
+            $this->findById($id)->update([
+                "email" => "{$nowDelete}-DELETE@gmail.com", 
+                "id_card" => "{$nowDelete}-DELETE"
+            ]);
+
             $this->findById($id)->delete();
             return true;
         } catch(ModelNotFoundException $e) {

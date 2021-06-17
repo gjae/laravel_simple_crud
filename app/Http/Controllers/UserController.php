@@ -110,6 +110,18 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $result = $this->repository->deleteById($id);
+        if ($result) {
+            return response()->json([
+                "error" => false,
+                "data" => []
+            ]);
+        }
+
+        return response()->json([
+            "error" => true,
+            "data" => []
+        ], 200);
+
     }
 }
