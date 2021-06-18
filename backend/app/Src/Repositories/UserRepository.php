@@ -3,6 +3,7 @@
 namespace App\Src\Repositories;
 
 use App\Src\Interfaces\{Repository, UserRepository as BaseUserInterface};
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -87,10 +88,10 @@ class UserRepository implements Repository, BaseUserInterface{
      */
     public function deleteById(int $id) : bool {
         try {
-            $nowDelete = now()->format("YmdHmi");
+            $fakeEmail = uniqid();
             $this->findById($id)->update([
-                "email" => "{$nowDelete}-DELETE@gmail.com", 
-                "id_card" => "{$nowDelete}-DELETE"
+                "email" => "{$fakeEmail}-DELETE@gmail.com", 
+                "id_card" => "{$fakeEmail}-DELETE"
             ]);
 
             $this->findById($id)->delete();
